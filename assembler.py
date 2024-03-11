@@ -30,6 +30,8 @@ dict_registers = {
     't5': '11110', 't6': '11111'
 }
 
+
+
 def comp(p):
     p = abs(p)
     p = bin(p)
@@ -187,4 +189,58 @@ def u_type(a):
         imm = imm[-20:]
     return imm + rd + opcode
 
+def assembler(instruct):
+    
+    inst = instruct.split(' ')
+    
+    if inst[0][-1] == ":":
+        labels[inst[0][:-1]] = program_count
+        inst = inst[1:]
 
+    if inst[0] in r_func:
+        output.append(r_type(inst))
+        return
+    elif inst[0] in b_opcode.keys():
+        output.append(b_type(inst))
+        return
+    elif inst[0] in u_opcodes.keys():
+        output.append(u_type(inst))
+        return
+    elif inst[0] == 'jal':
+        output.append(j_type(inst))
+        return
+    elif inst[0] == 'sw':
+        output.append(s_type(inst))
+        return
+    elif inst[0] in I_dict_opcode.keys():
+        output.append(i_type(inst))
+        return
+    else:
+        output.append("instruction is not as per the format!")
+        return
+
+# f = open("test3.txt", encoding = 'utf-8-sig')
+# file_list = f.readlines()
+# file_list[-1] = file_list[-1]+"\n"
+    
+file_list = sys.stdin.readlines()
+
+for i in file_list:
+    i = i.strip()
+    assembler(i)
+    program_count += 1
+
+for i in label_position:
+    imm = labels[label_position[i]]
+    imm = bin(imm)
+    imm = "000000000000" + imm
+    imm = imm[-12:]
+    output[i] = imm[0] + imm[2:8] + output[i][:-7] + imm[8:] + imm[1] + output[i][-7:]
+
+for i in label_position:
+    if label_position[i] not in labels:
+        print("Label", label_position[i], "doesn't exist! (line", i, ')')
+# for i in output:
+#     print(i)
+
+sys.stdout.write("\n".join(output))
