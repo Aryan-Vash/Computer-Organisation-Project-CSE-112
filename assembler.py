@@ -30,4 +30,118 @@ dict_registers = {
     't5': '11110', 't6': '11111'
 }
 
+def comp(p):
+    p = abs(p)
+    p = bin(p)
+    p = "00000000000000000000" + p
+    p = list(p[-20:])
+    i = 19
+    while (p[i] != '1'):
+        i -= 1
+    i -= 1
+    while (i>=0):
+        if p[i] == '0':
+            p[i] = '1'
+        else:
+            p[i] = '0'
+        i -= 1      
+    return ''.join(p)
+
+def comp_32(p):
+    p = abs(p)
+    p = bin(p)
+    p = "0"*32 + p
+    p = list(p[-32:])
+    i = 31
+    while (p[i] != '1'):
+        i -= 1
+    i -= 1
+    while (i>=0):
+        if p[i] == '0':
+            p[i] = '1'
+        else:
+            p[i] = '0'
+        i -= 1      
+    return ''.join(p)
+
+def bin(p):
+    binary = ''
+    while (p>0):
+        if p%2 == 0:
+            binary += "0"
+        else:
+            binary += "1"
+        p //= 2
+    return binary[::-1]
+
+def r_type(a):
+    
+    i = a[1]
+    j = i.split(',')
+    a = a[0:1] + j
+    
+    output = ''
+    opcode = '0110011'
+    funct7 = ''
+    funct3 = ''
+    if (a[1] not in dict_registers.keys()) or (a[2] not in dict_registers.keys()) or (a[3] not in dict_registers.keys()):
+        
+        return "instruction is not as per the format! (line"+str(program_count+1)+')'
+    else:
+        rs1 = dict_registers[a[2]]
+        rs2 = dict_registers[a[3]]
+        rd = dict_registers[a[1]]
+        
+
+    if a[0] == 'add':
+        funct7 = '0000000'
+        funct3 = '000'
+    elif a[0] == 'sub':
+        funct7 = '0100000'
+        funct3 = '000'
+        
+    elif a[0] == 'sll':
+        funct7 = '0000000'
+        funct3 = '001'
+    elif a[0] == 'slt':
+        funct7 = '0000000'
+        funct3 = '010'
+    elif a[0] == 'sltu':
+        funct7 = '0000000'
+        funct3 = '011'
+    elif a[0] == 'xor':
+        funct7 = '0000000'
+        funct3 = '100'
+    elif a[0] == 'srl':
+        funct7 = '0000000'
+        funct3 = '101'
+    elif a[0] == 'or':
+        funct7 = '0000000'
+        funct3 = '110'
+    else:
+        funct7 = '0000000'
+        funct3 = '111'
+    output = funct7 + rs2 + rs1 + funct3 + rd + opcode
+    return output
+
+def j_type(a):
+    i = a[1]
+    j = i.split(',')
+    a = a[0:1] + j
+    output = ''
+    opcode = '1101111'
+    imm = int(a[2])
+    if (a[1] not in dict_registers.keys()) or (imm < -1048576) or (imm > 1048575):
+        return "instruction is not as per the format! (line"+str(program_count+1)+')'
+    rd = dict_registers[a[1]]
+    if imm >= 0:
+        imm = bin(imm)
+        imm = "0"*32 + imm
+        imm = imm[-32:]
+    else:
+        imm = comp_32(imm)
+    output = imm[14] + imm[21:31] + imm[21] + imm[13:21] + rd + opcode
+    return output
+
+
 
