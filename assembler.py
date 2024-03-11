@@ -30,7 +30,33 @@ dict_registers = {
     't5': '11110', 't6': '11111'
 }
 
+def binary_converter(a):
+    if a == 0:
+        zero="0"*12
+        return zero
+    string=""                            #binary converter
+    z=""                                 #it will convert immediate(constant no.) into binary
+    while(a>0):
+        string+=str(int(a%2))
+        if a%2==1:
+            a=a-1
+        a=int(a/2)
+    n=len(string)
+    for i in range(n-1,-1,-1):
+        z+=string[i]
+    x=len(z)
+    y=12-x
+    w="0"*y
+    z=w+z
+    return z
 
+def BINARY_CONVERTER(a):
+    a=int(a)
+    if a>=0:                          #it will work for both signed and unsigned integer
+        return binary_converter(a)      #at the end it will return binary code of the integer if no. is from negative side then it will return its binary code according to 2's complement
+    else:
+        bin_str = bin(a & int("1" * 12, 2))[2:]
+        return '1' + bin_str.zfill(12- 1)
 
 def comp(p):
     p = abs(p)
@@ -75,6 +101,52 @@ def bin(p):
             binary += "1"
         p //= 2
     return binary[::-1]
+
+def s_type(a):
+    if a[0] == 'halt':
+        return b_opcode['halt'] + '00000' + b_dict_funct3['halt'] + dict_registers['zero'] + b_opcode['beq'] + '00000' + '00000' + '000000000000'
+    opcode=a[0]                    #opcode
+    func=a[0]                      #function
+    rd_imm=a[1]
+    b=rd_imm.split(",")
+    rd=b[0]                        #rd
+    rs_imm=b[1]
+    c=re.split(r"[()]",rs_imm)
+    imm=c[0]                       #rs
+    rs=c[1]                        #immediate
+    if(rs not in dict_registers or rd not in dict_registers or opcode not in S_dict_opcode or func not in S_dict_func):
+        return ("invalid entry")
+    elif(int(imm)>(2**11-1) or int(imm)<(-(2**11))):
+        return ("Immediate value is out of range")
+    else:
+        return((BINARY_CONVERTER(imm))[0:7]+ dict_registers[rd]+ dict_registers[rs]+ S_dict_func[func]+ (BINARY_CONVERTER(imm))[7:12]+ S_dict_opcode[opcode])
+
+
+import re
+
+def i_type(a):
+    opcode=a[0]
+    func=a[0]
+    if opcode=="lw":
+        register_immediate=a[1]
+        b=register_immediate.split(",")
+        rd=b[0]
+        rs_imm=b[1]
+        c=re.split(r"[()]",rs_imm)
+        imm=c[0]
+        rs=c[1]
+    else:   
+        register_immediate=a[1]
+        b=register_immediate.split(",")
+        rd=b[0]
+        rs=b[1]
+        imm=b[2]
+    if(rs not in dict_registers or rd not in dict_registers or opcode not in I_dict_opcode or func not in I_dict_func):
+        return ("Invalid entry")
+    elif(int(imm)>(2**11-1) or int(imm)<(-(2**11))):
+        return ("Immediate value is out of range")
+    else:
+        return (BINARY_CONVERTER(imm)+dict_registers[rs]+I_dict_func[func]+dict_registers[rd]+I_dict_opcode[opcode])
 
 def r_type(a):
     
