@@ -143,5 +143,23 @@ def j_type(a):
     output = imm[14] + imm[21:31] + imm[21] + imm[13:21] + rd + opcode
     return output
 
+def u_type(a):
+    i = a[1]
+    j = i.split(',')
+    a = a[0:1] + j
+    opcode = u_opcodes[a[0]]
+    if rd not in dict_registers:
+        return "instruction is not as per the format! (line"+str(program_count+1)+')'
+    rd = dict_registers[a[1]]
+    if a[2] < 0:
+        imm = int(a[2])
+    if imm >= 0:
+        imm = bin(imm)
+        imm = "0"*20 + imm
+        imm = imm[-20:]
+    else:
+        imm = comp(imm)
+        imm = imm[-20:]
+    return imm + rd + opcode
 
 
