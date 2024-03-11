@@ -142,6 +142,31 @@ def j_type(a):
         imm = comp_32(imm)
     output = imm[14] + imm[21:31] + imm[21] + imm[13:21] + rd + opcode
     return output
+def b_type(a):
+    i = a[1]
+    j = i.split(',')
+    a = a[0:1] + j
+    if a[0] == 'halt':
+        return b_opcode['halt'] + '00000' + b_dict_funct3['halt'] + dict_registers['zero'] + b_opcode['beq'] + '00000' + '00000' + '000000000000'
+
+    opcode = b_opcode[a[0]]
+
+    if a[0] in ['beq', 'bne', 'blt', 'bge', 'bltu', 'bgeu']:
+        if (a[1] not in dict_registers.keys()) or (a[2] not in dict_registers.keys()):
+            return "instruction is not as per the format! (line"+str(program_count+1)+')'
+        else:
+            rs1 = dict_registers[a[1]]
+            rs2 = dict_registers[a[2]]
+        if a[3].isdigit():
+            imm = int(a[3])
+            imm = bin(imm)
+            imm = "000000000000" + imm
+            imm = imm[-12:]
+            return imm[0] + imm[2:8] + rs2 + rs1 + b_dict_funct3[a[0]] + imm[8:] + imm[1] + opcode
+            # return imm[:7] + rs2 + rs1 + b_dict_funct3[a[0]] + imm[7:] + opcode
+        else:
+            label_position[program_count] = a[3]
+            return  rs2 + rs1 + b_dict_funct3[a[0]] + opcode
 
 def u_type(a):
     i = a[1]
