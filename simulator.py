@@ -36,3 +36,8 @@ def J(i):
 def simulator(i):
     ''' add ur if-else conditions in this function in order to find out which instruction
     type i is and call the above created functions if the reapective condition is satisfied. '''
+
+    if i[-7:] == R_opcode:
+        R(i)
+    if i[-7:] == B_opcode:
+        B(i)
