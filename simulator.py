@@ -50,14 +50,115 @@ S_opcode = '0100011'
 U_opcode = {'0110111':'lui', '0010111':'auipc'}
 I_opcode = {'0000011':'lw', '0010011':'addi', '0010011':'sltiu', '1100111':'jalr'}
 
+#Functions for R_Type Instructions
+def sub(rd, rs1, rs2):
+    
+    
+def add(rd, rs1, rs2):
+    
+    
+def sll(rd, rs1, rs2):
+    
+    
+def slt(rd, rs1, rs2):
+    
+    
+def sltu(rd, rs1, rs2):
+    
+    
+def xor(rd, rs1, rs2):
+    
+    
+def srl(rd, rs1, rs2):
+    
+    
+def or_func(rd, rs1, rs2):
+    
+
+def and_func(rd, rs1, rs2):
+    
+
 def R(i):
     # for R type instructions
+    funct3 = i[17:20]
+    funct7 = i[:7]
+    rs2 = dict_registers[i[7:12]]
+    rs1 = dict_registers[i[12:17]]
+    rd = dict_registers[i[20:25]]
+    
+    if funct7 == 0100000:
+        sub(rd, rs1, rs2) # signed value
+    elif funct3 == 000:
+        add(rd, rs1, rs2) # sign extension value
+    elif funct3 == 001:
+        sll(rd, rs1, rs2) # rs2 unsigned
+    elif funct3 == 010:
+        slt(rd, rs1, rs2) # sign extension value
+    elif funct3 == 011:
+        sltu(rd, rs1, rs2) # unsigned value
+    elif funct3 == 100:
+        xor(rd, rs1, rs2)
+    elif funct3 == 101:
+        srl(rd, rs1, rs2) # rs2 unsigned
+    elif funct3 == 110:
+        or_func(rd, rs1, rs2)
+    elif funct3 == 111:
+        and_func(rd, rs1, rs2)
 
 def I(i):
     # for I type instructions
 
+#Functions for B_Type Instructions
+def beq(rs1, rs2, imm):
+    # We need to change the binary string to decimal value first
+    if rs1 == rs2: # sign extension value
+        PC += imm
+    return PC
+
+def bne(rs1, rs2, imm):
+    if rs1 != rs2: # sign extension value
+        PC += imm
+    return PC
+
+def blt(rs1, rs2, imm):
+    if rs1 >= rs2: # sign extension value
+        PC += imm
+    return PC
+
+def bge(rs1, rs2, imm):
+    if rs1 >= rs2: # sign extension value
+        PC += imm
+    return PC
+
+def bltu(rs1, rs2, imm):
+    if rs1 < rs2: # unsigned value
+        PC += imm
+    return PC
+
+def bgeu(rs1, rs2, imm):
+    if rs1 >= rs2: # unsigned value
+        PC += imm
+    return PC
+
 def B(i):
     # for B type instructions
+    rs2 = dict_registers[i[7:12]]
+    rs1 = dict_registers[i[12:17]]
+    funct3 = i[17:20]
+    imm = i[20:24:-1] + i[1:7:-1] + i[24] + i[0]
+
+    if funct3 = 000:
+        beq(rs1, rs2, imm)
+    elif funct3 = 001:
+        bne(rs1, rs2, imm)
+    elif funct3 = 100:
+        blt(rs1, rs2, imm)
+    elif funct3 = 101:
+        bge(rs1, rs2, imm)
+    elif funct3 = 110:
+        bltu(rs1, rs2, imm)
+    elif funct3 = 111:
+        bgeu(rs1, rs2, imm)
 
 def S(i):
     # for S type instructions
