@@ -171,7 +171,9 @@ def S(i):
     imm = i[20:25:-1] + i[:7:-1]
     mem = register_values[rs1] + imm
     memory = bin_to_hex(mem)
-    register_values[rs2] = memory_values[memory]
+    memory_values[memory] = register_values[rs2]
+    PC += 4
+    return PC
 
 def U(i):
     # for U type instructions
