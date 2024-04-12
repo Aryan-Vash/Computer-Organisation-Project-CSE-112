@@ -166,6 +166,8 @@ def S(i):
 def U(i):
     # for U type instructions
 
+    
+
 def J(i):
     # for J type instructions
 
@@ -177,3 +179,5 @@ def simulator(i):
         R(i)
     if i[-7:] == B_opcode:
         B(i)
+    if i[-7:] == U_opcode:
+        U(i)
