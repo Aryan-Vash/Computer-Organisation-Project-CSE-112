@@ -175,6 +175,11 @@ def U(i):
         
 def J(i):
     # for J type instructions
+    rd = dict_registers[i[20:25]]
+    imm = 
+
+if i[-7:0] == 1101111:
+    jal(rd, imm)
 
 def simulator(i):
     ''' add ur if-else conditions in this function in order to find out which instruction
@@ -186,3 +191,5 @@ def simulator(i):
         B(i)
     if i[-7:] in U_opcode:
         U(i)
+    if i[-7:] == J_opcode:
+        J(i)
