@@ -165,9 +165,14 @@ def S(i):
 
 def U(i):
     # for U type instructions
-
+    rd = dict_registers[i[20:25]]
+    imm = i[0:20]
     
-
+    if i[-7:0] == 0110111:
+        lui(rd, imm)
+    elif i[-7:0] == 0010111:
+        auipc(rd, imm)
+        
 def J(i):
     # for J type instructions
 
