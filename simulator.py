@@ -159,9 +159,16 @@ def B(i):
         bltu(rs1, rs2, imm)
     elif funct3 = 111:
         bgeu(rs1, rs2, imm)
+# function for S_type instructions:
 
 def S(i):
     # for S type instructions
+    rs1= dict_registers[i[12:17]]
+    rs2= dict_registers[i[7:12]]
+    funct3= i[17:20]
+    imm= i[0:7] +i[20:25]
+    if funct3=010:
+        sw(rs2,imm,rs1)
 
 def U(i):
     # for U type instructions
@@ -193,3 +200,5 @@ def simulator(i):
         U(i)
     if i[-7:] == J_opcode:
         J(i)
+    if i[-7:]== S_opcode:
+        S(i)
