@@ -1,9 +1,12 @@
 import sys
 
-fname = sys.argv[1]
+PC = '0b00000000000000000000000000000000'
 
-with open(fname , 'r') as f:
-    input_list = f.readlines()
+# fname = sys.argv[0]
+
+# with open(fname , 'r') as f:
+#     input_list = f.readlines()
+input_list = ['00000000000000000000010010110011', '00000000000000000000100100110011', '00000000000000000000000001100011']
 
 def decimal_hexa(decimal):
     if not (0 <= decimal <= 0xFFFFFFFF):
@@ -92,7 +95,7 @@ memory_values = {
 
 #values stored in the registers
 register_values = {
-    'zero':'0b00000000000000000000000000000000', 'ra':'0b00000000000000000000000000000000', 'sp':'0b00000000000000000000000000000000', 
+    'zero':'0b00000000000000000000000000000000', 'ra':'0b00000000000000000000000000000000', 'sp':'0b00000000000000000000000100000000',
     'gp':'0b00000000000000000000000000000000', 'tp':'0b00000000000000000000000000000000', 't0':'0b00000000000000000000000000000000', 
     't1':'0b00000000000000000000000000000000', 't2':'0b00000000000000000000000000000000', 's0':'0b00000000000000000000000000000000', 
     's1':'0b00000000000000000000000000000000', 'a0':'0b00000000000000000000000000000000', 'a1':'0b00000000000000000000000000000000', 
@@ -121,14 +124,16 @@ I_opcode = {'0000011':'lw', '0010011':'addi', '0010011':'sltiu', '1100111':'jalr
 
 #Functions for R_Type Instructions
 def sub(rd, rs1, rs2):
+    global PC
     rs1_value = signed_decimal(register_values[rs1][2:])
     rs2_value = signed_decimal(register_values[rs2][2:])
     rd_value = rs1_value - rs2_value # signed values
-    register_values[rd] = '0b' + decimal_signed(rd_value)
+    register_values[rd] = '0b' + decimal_sign_ext(rd_value)
     PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + 4)
     return PC
     
 def add(rd, rs1, rs2):
+    global PC
     rs1_value = sign_ext_decimal(register_values[rs1][2:])
     rs2_value = sign_ext_decimal(register_values[rs2][2:])
     rd_value = rs1_value + rs2_value # sign extension values
@@ -137,6 +142,7 @@ def add(rd, rs1, rs2):
     return PC
     
 def sll(rd, rs1, rs2):
+    global PC
     rs1_value = rs1[2:]
     rs2_value = unsigned_decimal(register_values[rs2][-5:])
     for i in range(rs2_value):
@@ -144,6 +150,7 @@ def sll(rd, rs1, rs2):
     register_values[rd] = '0b' + rs1_value
     
 def slt(rd, rs1, rs2):
+    global PC
     rs1_value = sign_ext_decimal(register_values[rs1][2:])
     rs2_value = sign_ext_decimal(register_values[rs2][2:])
     if rs1_value < rs2_value: # sign extension value
@@ -155,28 +162,31 @@ def slt(rd, rs1, rs2):
     return PC
     
 def sltu(rd, rs1, rs2):
+    global PC
     rs1_value = unsigned_decimal(register_values[rs1][2:])
     rs2_value = unsigned_decimal(register_values[rs2][2:])
     if rs1_value < rs2_value: 
         rd_value = 1
     else:
         rd_value = 0
-    register_values[rd] = '0b' + decimal_unsigned(rd_value)
+    register_values[rd] = '0b' + decimal_sign_ext(rd_value)
     PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + 4)
     return PC
     
 def xor(rd, rs1, rs2):
+    global PC
     rs1_value = unsigned_decimal(register_values[rs1][2:])
     rs2_value = unsigned_decimal(register_values[rs2][2:])
     if (rs1_value == 1 and rs2_value == 1) or (rs1_value == 0 and rs2_value == 0):
         rd_value = 1
     else:
         rd_value = 0
-    register_values[rd] = '0b' + decimal_unsigned(rd_value)
+    register_values[rd] = '0b' + decimal_sign_ext(rd_value)
     PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + 4)
     return PC
     
 def srl(rd, rs1, rs2):
+    global PC
     rs1_value = rs1[2:]
     rs2_value = unsigned_decimal(register_values[rs2][-5:])
     for i in range(rs2_value):
@@ -184,28 +194,31 @@ def srl(rd, rs1, rs2):
     register_values[rd] = '0b' + rs1_value
      
 def or_func(rd, rs1, rs2):
+    global PC
     rs1_value = unsigned_decimal(register_values[rs1][2:])
     rs2_value = unsigned_decimal(register_values[rs2][2:])
     if (rs1_value == 1 or rs2_value == 1):
         rd_value = 1
     else:
         rd_value = 0
-    register_values[rd] = '0b' + decimal_unsigned(rd_value)
+    register_values[rd] = '0b' + decimal_sign_ext(rd_value)
     PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + 4)
     return PC
 
 def and_func(rd, rs1, rs2):
+    global PC
     rs1_value = unsigned_decimal(register_values[rs1][2:])
     rs2_value = unsigned_decimal(register_values[rs2][2:])
     if (rs1_value == 1 and rs2_value == 1):
         rd_value = 1
     else:
         rd_value = 0
-    register_values[rd] = '0b' + decimal_unsigned(rd_value)
+    register_values[rd] = '0b' + decimal_sign_ext(rd_value)
     PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + 4)
     return PC
 
 def R(i):
+    global PC
     # for R type instructions
     funct3 = i[17:20]
     funct7 = i[:7]
@@ -232,11 +245,61 @@ def R(i):
     elif funct3 == '111':
         return and_func(rd, rs1, rs2)
 
-# def I(i):
-    # for I type instructions
+#Functions for I_Type Instructions
+def addi(binary, rs, rd):
+    global PC
+    S_imm = sign_ext_decimal(binary)
+    S_rs = sign_ext_decimal(register_values[rs][2:])
+    register_values[rd] = '0b' + decimal_sign_ext(S_rs + S_imm)
+    PC = '0b' + decimal_unsigned((unsigned_decimal(PC)[2:]) + 4)
+    return PC
+
+def sltiu(rs, imm, rd):
+    global PC
+    RS = unsigned_decimal((register_values[rs])[2:])
+    IMM = unsigned_decimal(imm)
+    if RS < IMM:
+        register_values[rd]= '0b' + decimal_sign_ext(1)
+    PC = '0b' + decimal_unsigned((unsigned_decimal(PC)[2:]) + 4)
+    return PC
+
+def jalr(rd, rs, imm):          # it is a function call
+    global PC
+    register_values[rd] = '0b' + decimal_unsigned((unsigned_decimal(PC)[2:]) + 4)
+    S_rs = sign_ext_decimal((register_values[rs])[2:])
+    S_imm = sign_ext_decimal(imm)
+    pc = '0b' + decimal_unsigned(S_rs + S_imm)
+    PC = pc[:-1] + '0'
+    return PC
+    
+def lw(rd, rs, imm):
+    global PC
+    S_imm = sign_ext_decimal(imm)
+    S_rs = S_imm + (sign_ext_decimal((register_values[rs])[2:]))
+    mem = decimal_hexa(S_rs)
+    register_values[rd]= memory_values[mem]
+    PC = '0b' + decimal_unsigned((unsigned_decimal(PC)[2:]) + 4)
+    return PC
+
+ # for I type instructions
+def I(i):
+    global PC
+    imm = i[0:12]
+    rd = dict_registers[i[21:26]]
+    rs = dict_registers[i[12:17]]
+    if i[-7:] == '0010011':
+        if i[17:20] == '000':
+            return addi(imm, rs, rd)
+        else:
+            return sltiu(rs, imm, rd)
+    if i[-7:] == '1100111':
+        return jalr(rd, rs, imm)
+    if i[-7:] == '0000011':
+        return lw(rd, rs, imm)
 
 #Functions for B_Type Instructions
 def beq(rs1, rs2, imm):
+    global PC
     # We need to change the binary string to decimal value first
     rs1_value = sign_ext_decimal(register_values[rs1][2:])
     rs2_value = sign_ext_decimal(register_values[rs2][2:])
@@ -247,6 +310,7 @@ def beq(rs1, rs2, imm):
     return PC
 
 def bne(rs1, rs2, imm):
+    global PC
     rs1_value = sign_ext_decimal(register_values[rs1][2:])
     rs2_value = sign_ext_decimal(register_values[rs2][2:])
     if rs1_value != rs2_value: # sign extension value
@@ -256,6 +320,7 @@ def bne(rs1, rs2, imm):
     return PC
 
 def blt(rs1, rs2, imm):
+    global PC
     rs1_value = sign_ext_decimal(register_values[rs1][2:])
     rs2_value = sign_ext_decimal(register_values[rs2][2:])
     if rs1_value < rs2_value: # sign extension value
@@ -265,6 +330,7 @@ def blt(rs1, rs2, imm):
     return PC
 
 def bge(rs1, rs2, imm):
+    global PC
     rs1_value = sign_ext_decimal(register_values[rs1][2:])
     rs2_value = sign_ext_decimal(register_values[rs2][2:])
     if rs1_value >= rs2_value: # sign extension value
@@ -274,6 +340,7 @@ def bge(rs1, rs2, imm):
     return PC
 
 def bltu(rs1, rs2, imm):
+    global PC
     rs1_value = unsigned_decimal(register_values[rs1][2:])
     rs2_value = unsigned_decimal(register_values[rs2][2:])
     if rs1_value < rs2_value: # unsigned value
@@ -283,6 +350,7 @@ def bltu(rs1, rs2, imm):
     return PC
 
 def bgeu(rs1, rs2, imm):
+    global PC
     rs1_value = unsigned_decimal(register_values[rs1][2:])
     rs2_value = unsigned_decimal(register_values[rs2][2:])
     if rs1_value >= rs2_value: # unsigned value
@@ -293,11 +361,12 @@ def bgeu(rs1, rs2, imm):
 
 # for B type instructions
 def B(i):
+    global PC
     rs2 = dict_registers[i[7:12]]
     rs1 = dict_registers[i[12:17]]
     funct3 = i[17:20]
-    imm = i[20:24:-1] + i[1:7:-1] + i[24] + i[0]
-    imm += '0'
+    # imm = i[20:24:-1] + i[1:7:-1] + i[24] + i[0] + '0'
+    imm = i[0] + i[24] + i[1:7] + i[20:24] + '0'
 
     if funct3 == '000':
         return beq(rs1, rs2, imm)
@@ -314,10 +383,11 @@ def B(i):
 
 # for S type instructions
 def S(i):
+    global PC
     # funct3 = i[17:20]
     rs2 = dict_registers[i[7:12]]
     rs1 = dict_registers[i[12:17]]
-    imm = i[20:25:-1] + i[:7:-1]
+    imm = i[:7] + i[20:25]
     imm = sign_ext_decimal(imm)
     val = sign_ext_decimal(register_values[rs1])
     mem = val + imm
@@ -330,6 +400,7 @@ def S(i):
 
 #Functions for U_Type Instructions
 def lui(rd, imm):
+    global PC
     register_values[rd] = '0b' + imm 
     PC = unsigned_decimal(PC[2:])
     PC += 4
@@ -337,6 +408,7 @@ def lui(rd, imm):
     return PC
 
 def auipc(rd, imm):
+    global PC
     rd_value = unsigned_decimal(PC[2:]) + sign_ext_decimal(imm) 
     register_values[rd] = '0b' + sign_ext_decimal(rd_value)
     PC = unsigned_decimal(PC[2:])
@@ -346,6 +418,7 @@ def auipc(rd, imm):
 
 # for U type instructions
 def U(i):
+    global PC
     rd = dict_registers[i[20:25]]
     imm = i[0:20]
     imm += '0'*12
@@ -357,16 +430,16 @@ def U(i):
 
 # for J type instructions
 def J(i):
+    global PC
     rd = dict_registers[i[20:25]]
-    imm = i[1:11:-1] + i[11] + i[12:20] + i[20] + '0' 
+    imm = i[0] + i[12:] + i[11] + i[1:11] + '0'
     register_values[rd] = decimal_sign_ext(unsigned_decimal(PC[2:]) + 4)
     PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + sign_ext_decimal(imm))
     return PC
 
 # Main SIMULATOR Function
 def simulator(i):
-    ''' add ur if-else conditions in this function in order to find out which instruction
-    type i is and call the above created functions if the reapective condition is satisfied. '''
+    global PC
     
     if i[-7:] == R_opcode:
         return R(i)
@@ -376,22 +449,27 @@ def simulator(i):
         return S(i)
     if i[-7:] == U_opcode.keys():
         return U(i)
-    # if i[-7:] == I_opcode.keys():
-    #     return I(i)
+    if i[-7:] == I_opcode.keys():
+        return I(i)
     if i[-7:] == J_opcode:
         return J(i)
 
 output = []
 
-PC = '0b00000000000000000000000000000100'
-while ((unsigned_decimal(PC[2:])//4)<len(input_list)):
-    PC_next = simulator(input_list[(unsigned_decimal(PC[2:])/4)-1])
-    output_element = PC
+a=((unsigned_decimal(PC[2:])//4))
+b=len(input_list)
+while (a<b):
+    # print(output)
+    if input_list[a] == '0'*25 + '1100011': # virtual halt condition
+        break
+    PC_next = simulator(input_list[a])
+    output_element = PC_next
     for reg in register_values.keys():
         output_element += ' ' + register_values[reg] + ' '
     output_element = output_element[:-1]
     output.append(output_element)
     PC = PC_next
+    a=((unsigned_decimal(PC[2:])//4))
 
 # print(signed_decimal('11111111'))
 # print(sign_ext_decimal('11111111'))
@@ -404,9 +482,15 @@ while ((unsigned_decimal(PC[2:])//4)<len(input_list)):
 # memory = decimal_hexa(mem)
 # print(memory)
     
-out_file = sys.argv[2]
+# out_file = sys.argv[2]
 
-with open(out_file , 'w') as f:
-    for i in range(len(output)):
-        f.write(output[i])
-        f.write('\n')
+# with open(out_file , 'w') as f:
+#     for i in range(len(output)):
+#         f.write(output[i])
+#         f.write('\n')
+
+#     for keys, values in memory_values.items():
+#         f.write(keys+':'+values+'\n')
+# # 0x00010000:0b00000000000000000000000000001011
+# for keys, values in memory_values.items():
+#     print(keys+':'+values)
