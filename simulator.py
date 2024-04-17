@@ -157,8 +157,6 @@ def slt(rd, rs1, rs2):
     global PC
     rs1_value = sign_ext_decimal(register_values[rs1][2:])
     rs2_value = sign_ext_decimal(register_values[rs2][2:])
-    # print(rs1_value)
-    # print(rs2_value)
     if rs1_value < rs2_value: # sign extension value
         rd_value = 1
         register_values[rd] = '0b' + decimal_sign_ext(rd_value)
@@ -186,13 +184,10 @@ def xor(rd, rs1, rs2):
     
 def srl(rd, rs1, rs2):
     global PC
-    # print('value' , register_values[rd])
     rs1_value = unsigned_decimal(register_values[rs1][2:])
     rs2_value = unsigned_decimal(register_values[rs2][-5:])
     rd_value = rs1_value >> rs2_value
-    # print(rd_value)
     register_values[rd] = '0b' + decimal_sign_ext(rd_value)
-    # print('value' , register_values[rd])
     PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + 4)
      
 def or_func(rd, rs1, rs2):
@@ -221,19 +216,19 @@ def R(i):
     rd = dict_registers[i[20:25]]
     
     if funct7 == '0100000':
-        sub(rd, rs1, rs2) # signed value
+        sub(rd, rs1, rs2)  # signed value
     elif funct3 == '000':
-        add(rd, rs1, rs2) # sign extension value
+        add(rd, rs1, rs2)  # sign extension value
     elif funct3 == '001':
-        sll(rd, rs1, rs2) # rs2 unsigned
+        sll(rd, rs1, rs2)  # rs2 unsigned
     elif funct3 == '010':
-        slt(rd, rs1, rs2) # sign extension value
+        slt(rd, rs1, rs2)  # sign extension value
     elif funct3 == '011':
         sltu(rd, rs1, rs2) # unsigned value
     elif funct3 == '100':
         xor(rd, rs1, rs2)
     elif funct3 == '101':
-        srl(rd, rs1, rs2) # rs2 unsigned
+        srl(rd, rs1, rs2)  # rs2 unsigned
     elif funct3 == '110':
         or_func(rd, rs1, rs2)
     elif funct3 == '111':
@@ -269,9 +264,6 @@ def lw(rd, rs, imm):
     S_rs = S_imm + (sign_ext_decimal(register_values[rs][2:]))
     mem = decimal_hexa(S_rs)
     register_values[rd]= memory_values[mem]
-    # print(rs)
-    # print(register_values[rs])
-    # print(memory_values[mem])
     PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + 4)
 
  # for I type instructions
@@ -280,6 +272,7 @@ def I(i):
     imm = i[0:12]
     rd = dict_registers[i[20:25]]
     rs = dict_registers[i[12:17]]
+
     if i[-7:] == '0010011':
         if i[17:20] == '000':
             addi(imm, rs, rd)
@@ -295,7 +288,7 @@ def beq(rs1, rs2, imm):
     global PC
     rs1_value = sign_ext_decimal(register_values[rs1][2:])
     rs2_value = sign_ext_decimal(register_values[rs2][2:])
-    if rs1_value == rs2_value: # sign extension value
+    if rs1_value == rs2_value:   # sign extension value
         PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + sign_ext_decimal(imm))
     else:
         PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + 4)
@@ -304,10 +297,7 @@ def bne(rs1, rs2, imm):
     global PC
     rs1_value = sign_ext_decimal(register_values[rs1][2:])
     rs2_value = sign_ext_decimal(register_values[rs2][2:])
-    # print(rs1)
-    # print(rs1_value)
-    # print(rs2_value)
-    if rs1_value != rs2_value: # sign extension value
+    if rs1_value != rs2_value:   # sign extension value
         PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + sign_ext_decimal(imm))
     else:
         PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + 4)
@@ -316,7 +306,7 @@ def blt(rs1, rs2, imm):
     global PC
     rs1_value = sign_ext_decimal(register_values[rs1][2:])
     rs2_value = sign_ext_decimal(register_values[rs2][2:])
-    if rs1_value < rs2_value: # sign extension value
+    if rs1_value < rs2_value:    # sign extension value
         PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + sign_ext_decimal(imm))
     else:
         PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + 4)
@@ -325,7 +315,7 @@ def bge(rs1, rs2, imm):
     global PC
     rs1_value = sign_ext_decimal(register_values[rs1][2:])
     rs2_value = sign_ext_decimal(register_values[rs2][2:])
-    if rs1_value >= rs2_value: # sign extension value
+    if rs1_value >= rs2_value:   # sign extension value
         PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + sign_ext_decimal(imm))
     else:
         PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + 4)
@@ -334,7 +324,7 @@ def bltu(rs1, rs2, imm):
     global PC
     rs1_value = unsigned_decimal(register_values[rs1][2:])
     rs2_value = unsigned_decimal(register_values[rs2][2:])
-    if rs1_value < rs2_value: # unsigned value
+    if rs1_value < rs2_value:    # unsigned value
         PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + sign_ext_decimal(imm))
     else:
         PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + 4)
@@ -343,7 +333,7 @@ def bgeu(rs1, rs2, imm):
     global PC
     rs1_value = unsigned_decimal(register_values[rs1][2:])
     rs2_value = unsigned_decimal(register_values[rs2][2:])
-    if rs1_value >= rs2_value: # unsigned value
+    if rs1_value >= rs2_value:   # unsigned value
         PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + sign_ext_decimal(imm))
     else:
         PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + 4)
@@ -380,29 +370,21 @@ def S(i):
     val = unsigned_decimal(register_values[rs1][2:])
    
     mem = val + imm
-    
     memory = decimal_hexa(mem)
     memory_values[memory] = register_values[rs2]
-    # print(memory)
-    # print(memory_values[memory])
     PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + 4)
 
 #Functions for U_Type Instructions
 def lui(rd, imm):
     global PC
     register_values[rd] = '0b' + imm
-    
-    PC = unsigned_decimal(PC[2:])
-    PC += 4
-    PC = '0b' + decimal_unsigned(PC)
+    PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + 4)
 
 def auipc(rd, imm):
     global PC
     rd_value = unsigned_decimal(PC[2:]) + sign_ext_decimal(imm) 
     register_values[rd] = '0b' + decimal_sign_ext(rd_value)
-    PC = unsigned_decimal(PC[2:])
-    PC += 4
-    PC = '0b' + decimal_unsigned(PC)
+    PC = '0b' + decimal_unsigned(unsigned_decimal(PC[2:]) + 4)
 
 # for U type instructions
 def U(i):
@@ -410,7 +392,6 @@ def U(i):
     rd = dict_registers[i[20:25]]
     imm = i[0:20] + '000000000000'
     
-
     if i[-7:] == '0110111':
         lui(rd, imm)
     elif i[-7:] == '0010111':
@@ -434,11 +415,9 @@ b=len(input_list)
 
 while (data != halt): 
 
-    # print(data)
     if data[-7:] == R_opcode:
         R(data)
     elif data[-7:] == B_opcode:
-        # print('HI')
         B(data)
     elif data[-7:] == S_opcode:
         S(data)
@@ -458,7 +437,7 @@ while (data != halt):
     data = input_list[a]
     if data != halt:
         data = data[:-1]
-    # print(unsigned_decimal(PC[2:]))
+    
 output_element = PC
 for reg in register_values.keys():
     output_element += ' ' + register_values[reg]
