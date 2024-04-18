@@ -247,7 +247,7 @@ def u_type(a):
     j = i.split(',')
     a = a[0:1] + j
     opcode = u_opcodes[a[0]]
-    if rd not in dict_registers:
+    if a[1] not in dict_registers:
         return "instruction is not as per the format! (line"+str(program_count+1)+')'
     rd = dict_registers[a[1]]
     if a[2] < 0:
@@ -294,8 +294,13 @@ def assembler(instruct):
 # f = open("test3.txt", encoding = 'utf-8-sig')
 # file_list = f.readlines()
 # file_list[-1] = file_list[-1]+"\n"
-    
-file_list = sys.stdin.readlines()
+
+
+fname = sys.argv[1]
+
+with open(fname , 'r') as f:
+    file_list = f.readlines()
+# file_list = sys.stdin.readlines()
 
 for i in file_list:
     i = i.strip()
@@ -314,5 +319,10 @@ for i in label_position:
         print("Label", label_position[i], "doesn't exist! (line", i, ')')
 # for i in output:
 #     print(i)
+out_file = sys.argv[2]
 
-sys.stdout.write("\n".join(output))
+with open(out_file , 'w') as f:
+    for i in range(len(output)):
+        f.write(output[i])
+        f.write('\n')
+# sys.stdout.write("\n".join(output))
