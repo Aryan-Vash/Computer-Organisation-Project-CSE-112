@@ -1,4 +1,4 @@
-# 🖥Computer Organisation Project: RISC-V Assembler & Simulator
+# Computer Organisation Project: RISC-V Assembler & Simulator
 
 This project simulates a basic computer architecture, including an **assembler** and an **instruction-level simulator**. It demonstrates how assembly instructions are translated into machine code and executed, offering hands-on insight into computer organisation concepts.
 
@@ -60,10 +60,10 @@ python3 simulator.py
 
 ## Author
 
-> Add your name and details here if you'd like contributors or professors to credit you!
+- Aryan Vashishtha: aryan23148@iiitd.ac.in
 
 ---
 
 ## License
 
-This project is for educational purposes. Feel free to reuse and modify it for academic use.
+This project is for educational purposes.
