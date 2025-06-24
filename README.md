@@ -61,6 +61,9 @@ python3 simulator.py
 ## Author
 
 - Aryan Vashishtha: aryan23148@iiitd.ac.in
+- Anika Aharwal: anika23086@iiitd.ac.in
+- Bhargavi Yerramilli: bhargavi23168@iiitd.ac.in
+- Divyank: divyank23206@iiitd.ac.in
 
 ---
 
